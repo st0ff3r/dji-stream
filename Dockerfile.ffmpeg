@@ -1,0 +1,17 @@
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    bash \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY ffmpeg-entrypoint.sh /app/ffmpeg-entrypoint.sh
+
+RUN chmod +x /app/ffmpeg-entrypoint.sh
+
+ENTRYPOINT ["/app/ffmpeg-entrypoint.sh"]
