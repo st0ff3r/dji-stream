@@ -1,30 +1,33 @@
 #!/bin/sh
 set -e
 
-echo "[ffmpeg] stabilizing DJI H264 bitstream..."
+echo "[ffmpeg] stabilizing DJI H264 bitstream (720p optimized)..."
 
 while true; do
 	ffmpeg \
 		-hide_banner \
 		-loglevel warning \
-		-fflags +discardcorrupt+genpts \
+		-fflags +discardcorrupt+genpts+nobuffer \
+		-analyzeduration 1000000 \
+		-probesize 1000000 \
 		-err_detect ignore_err \
-		-analyzeduration 5000000 \
-		-probesize 5000000 \
 		-i rtmp://rtmp/drone \
 		-map 0:v:0 \
 		-an \
 		-c:v libx264 \
-		-preset veryfast \
+		-preset superfast \
 		-tune zerolatency \
 		-pix_fmt yuv420p \
-		-vf "format=yuv420p,scale=1280:720" \
-		-x264-params "nal-hrd=cbr:force-cfr=1:keyint=60:min-keyint=60:scenecut=0" \
-		-b:v 2500k \
-		-maxrate 2500k \
-		-bufsize 5000k \
+		-vf "scale=1280:720:flags=fast_bilinear" \
+		-r 30 \
+		-b:v 1800k \
+		-maxrate 1800k \
+		-bufsize 3600k \
+		-g 60 \
+		-keyint_min 60 \
+		-sc_threshold 0 \
 		-f flv rtmp://rtmp/ffmpeg
 
 	echo "[ffmpeg] restart..."
-	sleep 2
+	sleep 1
 done
