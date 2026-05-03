@@ -17,4 +17,6 @@ services:
     container_name: ffmpeg-repair
     depends_on:
       - rtmp
+    volumes:
+      - ./data:/opt/data
     restart: unless-stopped
